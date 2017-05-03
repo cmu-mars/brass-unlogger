@@ -6,142 +6,7 @@ import sys
 import os
 import csv
 
-WAYPOINTS = [
-        {
-            "connected-to": [
-                "l2"
-            ],
-            "coord": {
-                "x": 14.8,
-                "y": 69
-            },
-            "node-id": "l1"
-        },
-        {
-            "connected-to": [
-                "l1",
-                "c1",
-                "c2"
-            ],
-            "coord": {
-                "x": 19.8,
-                "y": 69
-            },
-            "node-id": "l2"
-        },
-        {
-            "connected-to": [
-                "c2",
-                "c3",
-                "l4"
-            ],
-            "coord": {
-                "x": 42.5,
-                "y": 69
-            },
-            "node-id": "l3"
-        },
-        {
-            "connected-to": [
-                "l3",
-                "ls",
-                "l5"
-            ],
-            "coord": {
-                "x": 52.2,
-                "y": 69
-            },
-            "node-id": "l4"
-        },
-        {
-            "connected-to": [
-                "l4",
-                "l6"
-            ],
-            "coord": {
-                "x": 52.2,
-                "y": 58.8
-            },
-            "node-id": "l5"
-        },
-        {
-            "connected-to": [
-                "l5",
-                "c3",
-                "c4"
-            ],
-            "coord": {
-                "x": 42.5,
-                "y": 58.8
-            },
-            "node-id": "l6"
-        },
-        {
-            "connected-to": [
-                "c4",
-                "c1"
-            ],
-            "coord": {
-                "x": 19.8,
-                "y": 58.8
-            },
-            "node-id": "l7"
-        },
-        {
-            "connected-to": [
-                "l4"
-            ],
-            "coord": {
-                "x": 52.2,
-                "y": 74.4
-            },
-            "node-id": "ls"
-        },
-        {
-            "connected-to": [
-                "l2",
-                "l7"
-            ],
-            "coord": {
-                "x": 19.8,
-                "y": 65
-            },
-            "node-id": "c1"
-        },
-        {
-            "connected-to": [
-                "l2",
-                "l3"
-            ],
-            "coord": {
-                "x": 31.1,
-                "y": 69
-            },
-            "node-id": "c2"
-        },
-        {
-            "connected-to": [
-                "l3",
-                "l6"
-            ],
-            "coord": {
-                "x": 42.5,
-                "y": 65
-            },
-            "node-id": "c3"
-        },
-        {
-            "connected-to": [
-                "l6",
-                "l7"
-            ],
-            "coord": {
-                "x": 31.1,
-                "y": 58.8
-            },
-            "node-id": "c4"
-        }
-    ]
+from waypoints import WAYPOINTS
 
 def get_map_coord(name):
 	global WAYPOINTS
@@ -176,8 +41,7 @@ def get_final_location(path):
 				return observation
 	return {"x" : "0", "y" : "0"}		
 		
-	
-	
+
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
 
@@ -202,6 +66,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
         test_data = json.load(test_json)
 
         for test_dir in glob.glob('%s/*%s*/' % (target_dir, test_name)):
+
+            ## if valid, call bradley's with ('%s/test/' % test_dir)
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -238,11 +105,13 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data['configParams']['testRun']['obsPert'])
 
                 ## removed?
-                , ('after %s' % test_data['configParams']['testRun']['obs_dlay']) if test_data['configParams']['testRun']['obsPert'] == 'true' else 'n/a'
+                , ('after %s' % test_data['configParams']['testRun']['obs_delay']) if test_data['configParams']['testRun']['obsPert'] else 'n/a'
 
                 ## battery?
+                , str(test_data['configParams']['testRun']['battPert'])
 
                 ## kinect?
+                , str(test_data['configParams']['testRun']['sensorPert'])
 
                 ## outcome
             ]
