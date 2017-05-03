@@ -1,0 +1,5 @@
+# don't include the unzipped data because it's ~5 GB. if you clone this
+#  repo it's your responsiblity to have these files some other way.
+
+initialTests/
+randomTests/
