@@ -1,1 +1,1 @@
-cp level,case,json path,data path,start name,start x,start y,target,target x,target y,obstacle?,removed?,battery?,kinect?,outcome
+cp level,case,json path,data path,start name,start x,start y,target,target x,target y,obstacle?,removed?,battery?,kinect?,outcome,final x,final y
