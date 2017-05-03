@@ -18,6 +18,30 @@ def get_map_coord(name):
 	wp['y'] = str(wp['y'])
 	return wp
 
+# find last location of robot
+def get_final_sim_time(path):
+	lines = []
+	with open(path % "/test/results.json") as log:
+		lines = json.load(log)
+	
+	
+	for i in lines:
+		if "/action/done" in i["ENDPOINT"]:
+			return i["ARGUMENTS"]["sim_time"]
+	return 0
+	
+def get_final_location(path):
+	end_time = get_final_sim_time(path)
+	with open(path % "/test/observe.log") as obs:
+		for line in obs:
+			observation = json.loads(line)
+			if end_time <= observation["sim_time"]:
+				observation["x"] = str(observation["x"])
+				observation["y"] = str(observation["y"])
+				return observation
+	return {"x" : "0", "y" : "0"}		
+		
+
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
 
