@@ -65,6 +65,18 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## target y
                 , get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
+
+                ## obstacle?
+                , str(test_data['configParams']['testRun']['obsPert'])
+
+                ## removed?
+                , ('after %s' % test_data['configParams']['testRun']['obs_dlay']) if test_data['configParams']['testRun']['obsPert'] == 'true' else 'n/a'
+
+                ## battery?
+
+                ## kinect?
+
+                ## outcome
             ]
 
 

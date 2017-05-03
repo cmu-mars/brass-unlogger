@@ -3,13 +3,13 @@ same; initialTests/*/ looks like randomTests, with json files that share
 hashes in their names with directories.
 
 this is weird:
-
+```
 iev@iev-mbp brass-unlogger % ./unlogger.py randomTests | wc -l
      600
 iev@iev-mbp brass-unlogger % ./unlogger.py randomTests | sort | uniq | wc -l
      600
 iev@iev-mbp brass-unlogger %
-
+```
 this implies that there are 600 random tests, not 300; when i ran that,
 unlogger was printing just the hashes from the json objects they use to
 name the tests.
@@ -20,7 +20,7 @@ name the tests.
 
 
 csv with columns:
-
+```
 CP = which challenge problem, 1 or 2
 Case = which case, BaselineA = A, BaselineB = B, Challenge = C
 ID = the directory name of the test this is in (e.g., CP1_TC1_5567...)
@@ -53,3 +53,4 @@ Fy = y of final location of the robot at Ft
 Fb = voltage reading at Ft
 #N = number of notifications about the new deadline we gave
 D = sim time of the final deadline we notified about
+```
