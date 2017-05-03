@@ -21,21 +21,22 @@ def get_map_coord(name):
 # find last location of robot
 def get_final_sim_time(path):
 	lines = []
-	with open(path % "/test/results.json") as log:
+	with open("%s/results.json" % path) as log:
 		lines = json.load(log)
 	
 	
 	for i in lines:
 		if "/action/done" in i["ENDPOINT"]:
-			return i["ARGUMENTS"]["sim_time"]
+			return int(i["ARGUMENTS"]["sim_time"])
 	return 0
 	
 def get_final_location(path):
 	end_time = get_final_sim_time(path)
-	with open(path % "/test/observe.log") as obs:
+	with open("%s/observe.log" % path) as obs:
 		for line in obs:
 			observation = json.loads(line)
-			if end_time <= observation["sim_time"]:
+			observation = observation["RESULT"]
+			if end_time <= int(observation["sim_time"]):
 				observation["x"] = str(observation["x"])
 				observation["y"] = str(observation["y"])
 				return observation
@@ -68,7 +69,8 @@ for j_path in glob.glob('%s/*.json' % target_dir):
         for test_dir in glob.glob('%s/*%s*/' % (target_dir, test_name)):
 
             ## if valid, call bradley's with ('%s/test/' % test_dir)
-
+            final_location = get_final_location('%s/test' % test_dir)
+			
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -114,6 +116,11 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
                 ## outcome
+				
+				## final x
+				, final_location["x"]
+				## final y
+				, final_location["y"]
             ]
 
 
