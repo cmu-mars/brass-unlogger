@@ -23,13 +23,13 @@ def get_final_sim_time(path):
 	lines = []
 	with open(path % "/test/results.json") as log:
 		lines = json.load(log)
-	
-	
+
+
 	for i in lines:
 		if "/action/done" in i["ENDPOINT"]:
 			return i["ARGUMENTS"]["sim_time"]
 	return 0
-	
+
 def get_final_location(path):
 	end_time = get_final_sim_time(path)
 	with open(path % "/test/observe.log") as obs:
@@ -39,8 +39,8 @@ def get_final_location(path):
 				observation["x"] = str(observation["x"])
 				observation["y"] = str(observation["y"])
 				return observation
-	return {"x" : "0", "y" : "0"}		
-		
+	return {"x" : "0", "y" : "0"}
+
 
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
@@ -111,14 +111,20 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
-                ## accuracy outcome
-                , test_data['A']['Accuracy']
+                ## outcome
 
-                ## timing outcome
-                #, test_data[str(test_dir_parts[2])]['Timing']
+                ## accuracy
+                , str(test_data[test_dir_parts[2]][0][1])
 
-                ## safety outcome
-                #, test_data[str(test_dir_parts[2])]['Safety']
+                ## timing
+                , str(test_data[test_dir_parts[2]][1][1])
+
+                    ##Only cp1 has safety and timing, both have accuracy, and only cp2 has detection
+
+                ## safety -- if cp1
+                ## , str(test_data[test_dir_parts[2]][2][1])
+
+                ## detection -- if cp2
             ]
 
 
