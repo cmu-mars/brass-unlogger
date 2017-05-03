@@ -3,3 +3,6 @@
 
 initialTests/
 randomTests/
+
+## this is the product of run.sh, so shouldn't be versioned
+results.csv
