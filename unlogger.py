@@ -61,8 +61,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
     ## test.
     test_name = (json_parts[2].split('.'))[0]
 
-    ## print test_name
-
     with open(j_path) as test_json:
         test_data = json.load(test_json)
 
@@ -114,8 +112,16 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
+		
 
-                ## outcome
+                ## accuracy outcome
+                , test_data['A']['Accuracy']
+
+                ## timing outcome
+                #, test_data[str(test_dir_parts[2])]['Timing']
+
+                ## safety outcome
+                #, test_data[str(test_dir_parts[2])]['Safety']
 				
 				## final x
 				, final_location["x"]
