@@ -6,8 +6,14 @@ import sys
 import os
 import csv
 import re
+import math
 
 from waypoints import WAYPOINTS
+
+def dist(x1, y1, x2, y2):
+    if "n/a" in [x1,x2,y1,y2]:
+        return "n/a"
+    return math.sqrt((float(x2) - float(x1))**2 + (float(y2) - float(y1))**2)
 
 def get_map_coord(name):
     filtered = filter(lambda waypoint: waypoint["node-id"] == name, WAYPOINTS)
@@ -110,6 +116,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
             obstacle_information = get_obstacle_information(log_entries)
 
+            target_x = get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
+            target_y = get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -137,10 +146,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , test_data['configParams']['testInit']['target_loc']
 
                 ## target x
-                , get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
+                , target_x
 
                 ## target y
-                , get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
+                , target_y
 
                 ## obstacle?
                 , str(test_data['configParams']['testRun']['obsPert'])
@@ -182,7 +191,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## distance from goal
 
-                , "distance"
+                , str(dist(target_x,target_y,final_location["x"],final_location["y"]))
 
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
                 , obstacle_information['x'] if 'x' in obstacle_information else "n/a"
