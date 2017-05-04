@@ -10,41 +10,43 @@ import os.path
 from waypoints import WAYPOINTS
 
 def get_map_coord(name):
-        filtered = filter(lambda waypoint: waypoint["node-id"] == name, WAYPOINTS)
-        if len(filtered) != 1:
-                return {'x': "0.0", 'y' : "0,0"}
-        wp = filtered[0]['coord']
-        wp['x'] = str(wp['x'])
-        wp['y'] = str(wp['y'])
-        return wp
+    filtered = filter(lambda waypoint: waypoint["node-id"] == name, WAYPOINTS)
+    if len(filtered) != 1:
+        return {'x': "0.0", 'y' : "0,0"}
+    wp = filtered[0]['coord']
+    wp['x'] = str(wp['x'])
+    wp['y'] = str(wp['y'])
+    return wp
 
 # find last location of robot
-def get_final_sim_time(path):
-        lines = []
-        with open("%s/results.json" % path) as log:
-                lines = json.load(log)
 
+def get_log_entries(path):
+    lines = []
+    with open("%s/results.json" % path) as log:
+        lines = json.load(log)
+    return lines
 
-        for i in lines:
-                if "/action/done" in i["ENDPOINT"]:
-                        return int(i["ARGUMENTS"]["sim_time"])
-        return 0
+def get_final_sim_time(log):
+    for i in log:
+        if "/action/done" in i["ENDPOINT"]:
+            return int(i["ARGUMENTS"]["sim_time"])
+    return 0
 
-def get_final_location(path):
-        end_time = get_final_sim_time(path)
-        try:
-            with open("%s/observe.log" % path) as obs:
-                for line in obs:
-                    observation = json.loads(line)
-                    observation = observation["RESULT"]
-                    if end_time <= int(observation["sim_time"]):
-                        observation["x"] = str(observation["x"])
-                        observation["y"] = str(observation["y"])
-                        return observation
-        except IOError:
-            return {"x" : "n/a", "y" : "n/a"}
-        except TypeError:
-            return {"x" : "n/a", "y" : "n/a"}
+def get_final_location(path,log):
+    end_time = get_final_sim_time(log)
+    try:
+        with open("%s/observe.log" % path) as obs:
+            for line in obs:
+                observation = json.loads(line)
+                observation = observation["RESULT"]
+                if end_time <= int(observation["sim_time"]):
+                    observation["x"] = str(observation["x"])
+                    observation["y"] = str(observation["y"])
+                    return observation
+    except IOError:
+        return {"x" : "n/a", "y" : "n/a"}
+    except TypeError:
+        return {"x" : "n/a", "y" : "n/a"}
 
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
@@ -70,7 +72,8 @@ for j_path in glob.glob('%s/*.json' % target_dir):
         for test_dir in glob.glob('%s/*%s*/' % (target_dir, test_name)):
 
             ## if valid, call bradley's with ('%s/test/' % test_dir)
-            final_location = get_final_location('%s/test' % test_dir)
+            log_entries = get_log_entries('%s/test' % test_dir)
+            final_location = get_final_location('%s/test' % test_dir, log_entries)
 
             test_dir_parts = test_dir.split("_")
             output = [
