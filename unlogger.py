@@ -52,6 +52,7 @@ def get_final_location(path):
                 if end_time <= int(observation["sim_time"]):
                     observation["x"] = str(observation["x"])
                     observation["y"] = str(observation["y"])
+                    observation["voltage"] = str(observation["voltage"])
                     return observation
     except IOError:
         return {"x" : "n/a", "y" : "n/a"}
@@ -60,7 +61,7 @@ def get_final_location(path):
 
 # Get the obstacle information from the log entries (test/log)
 # Return empty array if it does not exist
-def get_obstacle_information(log):
+def get_observations(log):
     info = {}
     remove_time_in_next_observe = False
     battery_time_in_next_observe = False
@@ -137,7 +138,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             log_entries = get_log_entries('%s/test' % test_dir)
             final_location = get_final_location('%s/test' % test_dir)
 
-            obstacle_information = get_obstacle_information(log_entries)
+            observations = get_observations(log_entries)
 
             target_x = get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
             target_y = get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
@@ -192,18 +193,18 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data['configParams']['testRun']['battPert'])
 
                 ## perturb level battery level
-                , info['voltage'] if 'voltage' in info else "n/a"
+                , observations['voltage'] if 'voltage' in observations else "n/a"
                 #, str(test_data['configParams']['testRun']['batt_reduce']) if test_data['configParams']['testRun']['battPert'] else "n/a"
 
                 ## time perturbed
-                , info['battery_time'] if 'battery_time' in info else "n/a"
+                , observations['battery_time'] if 'battery_time' in observations else "n/a"
                 #, str(test_data['configParams']['testRun']['batt_delay']) if test_data['configParams']['testRun']['battPert'] else "n/a"
 
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
                 ## kinect delay
-                , info['kinect_time'] if 'kinect_time' in info else "n/a"
+                , observations['kinect_time'] if 'kinect_time' in observations else "n/a"
                 #, str(test_data['configParams']['testRun']['bump_delay']) if test_data['configParams']['testRun']['sensorPert'] else "n/a"
 
                 ## outcome
@@ -231,15 +232,18 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## final y
                 , final_location["y"]
+                
+                ## final voltage
+                , final_location["voltage"]
 
                 ## distance from goal
                 , str(dist(target_x,target_y,final_location["x"],final_location["y"]))
 
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
-                , obstacle_information['x'] if 'x' in obstacle_information else "n/a"
-                , obstacle_information['y'] if 'y' in obstacle_information else "n/a"
-                , obstacle_information['place_time'] if 'place_time' in obstacle_information else "n/a"
-                , obstacle_information['remove_time'] if 'remove_time' in obstacle_information else "n/a"
+                , observations['x'] if 'x' in observations else "n/a"
+                , observations['y'] if 'y' in observations else "n/a"
+                , observations['place_time'] if 'place_time' in observations else "n/a"
+                , observations['remove_time'] if 'remove_time' in observations else "n/a"
 
                 # notifications
                 , str(num_notifications)
