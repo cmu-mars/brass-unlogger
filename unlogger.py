@@ -160,7 +160,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data['configParams']['testRun']['obsPert'])
 
                 ## removed?
-                , ('after %s' % test_data['configParams']['testRun']['obs_delay']) if test_data['configParams']['testRun']['obsPert'] else 'n/a'
+                , str(test_data['configParams']['testRun']['obs_delay']) if test_data['configParams']['testRun']['obsPert'] else 'n/a'
 
                 ## battery?
                 , str(test_data['configParams']['testRun']['battPert'])
