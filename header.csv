@@ -1,1 +1,1 @@
-cp level,case,json path,data path,start name,start x,start y,target name,target x,target y,obstacle?,removed?,battery?,kinect?,outcome,accuracy,timing,safety,detection,final x, final y, obstacle x, obstacle y, obstacle time, removal time
+cp level,case,json path,data path,start name,start x,start y,target name,target x,target y,obstacle?,removed?,battery?,kinect?,outcome,accuracy,timing,safety,detection,final x, final y,distance to goal,obstacle x, obstacle y, obstacle time, removal time

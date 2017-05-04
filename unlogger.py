@@ -5,7 +5,6 @@ import glob
 import sys
 import os
 import csv
-import os.path
 import re
 
 from waypoints import WAYPOINTS
@@ -180,6 +179,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## final y
                 , final_location["y"]
+
+                ## distance from goal
+
+                , "distance"
 
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
                 , obstacle_information['x'] if 'x' in obstacle_information else "n/a"
