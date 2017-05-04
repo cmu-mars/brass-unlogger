@@ -119,6 +119,17 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             target_x = get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
             target_y = get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
 
+            num_notifications = "n/a"
+            try:
+                if json_parts[0] == "CP1":
+                    num_notifications = 0
+                    with open('%s/test/mars_notifications.txt' % test_dir) as note_file:
+                        for l in note_file:
+                            num_notifications += 1
+            except IOError:
+                num_notifications = "n/a"
+
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -197,6 +208,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , obstacle_information['y'] if 'y' in obstacle_information else "n/a"
                 , obstacle_information['place_time'] if 'place_time' in obstacle_information else "n/a"
                 , obstacle_information['remove_time'] if 'remove_time' in obstacle_information else "n/a"
+
+                # notifications
+                , str(num_notifications)
             ]
 
             print (",").join(output)

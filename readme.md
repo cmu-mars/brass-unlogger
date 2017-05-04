@@ -51,6 +51,6 @@ Ft = sim time when the challenge ended (e.g., report back that robot reached tar
 -- Fy = y of final location of the robot at Ft
 -- Df = the distance between the robot and goal at Ft
 Fb = voltage reading at Ft
-#N = number of notifications about the new deadline we gave
+-- #N = number of notifications about the new deadline we gave
 D = sim time of the final deadline we notified about
 ```
