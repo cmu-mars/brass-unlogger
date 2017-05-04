@@ -182,6 +182,24 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 pert_simtime = "n/a"
                 done_simtime = "n/a"
 
+            first_simtime = "n/a"
+            # find the sim time in the first time they hit our
+            # observe. this is somewhat redundant to the get_observations
+            # above, but since it only looks at a prefix of the file, it's
+            # faster and fine for now.
+            try:
+                with open('%s/test/log' % test_dir) as log_file:
+                    for line in log_file:
+                        if "/action/observe returning response" in line:
+                            ## easier to grab it with a regex as above,
+                            ## because it's in escaped json in a string
+                            sim_time_pattern = re.compile('sim_time..: ..(\d+)')
+                            m = sim_time_pattern.search(line)
+                            first_simtime = m.group(1)
+                            break
+            except IOError:
+                first_simtime = "n/a"
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -275,6 +293,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 # sim time that the perturbation was detected
                 , pert_simtime
+
+                # first observed sim time
+                , first_simtime
 
                 # sim time when the challenge ended
                 , done_simtime
