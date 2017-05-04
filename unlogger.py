@@ -116,9 +116,13 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
             obstacle_information = get_obstacle_information(log_entries)
 
+            # store the target x and y coordinates, because we use them
+            # several times below
             target_x = get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
             target_y = get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
 
+            # count the number of lines in notifications.txt to count how
+            # many times we send notifications
             num_notifications = "n/a"
             try:
                 if json_parts[0] == "CP1":
@@ -129,9 +133,25 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             except IOError:
                 num_notifications = "n/a"
 
-
+            # read ll-api.log to compute the simtimes for when we
+            # detect the perturbation and when we hit /action/done
             pert_simtime = "n/a"
             done_simtime = "n/a"
+            try:
+                with open('%s/test/ll-api.log' % test_dir) as api_file:
+                    for line in api_file:
+                        if "PERTURBATION_DETECTED" in line:
+                            data = json.loads(((":").join((line.split(':'))[1:])))
+                            pert_simtime = str(data['MESSAGE']['sim_time'])
+
+                        # we may hit done many times, but this will over
+                        # write each time, so we'll end up with the last.
+                        if "/action/done" in line:
+                            data = json.loads(((":").join((line.split(':'))[1:])))
+                            done_simtime = str(data['ARGUMENTS']['sim_time'])
+            except IOError:
+                pert_simtime = "n/a"
+                done_simtime = "n/a"
 
             test_dir_parts = test_dir.split("_")
             output = [
