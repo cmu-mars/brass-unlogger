@@ -86,7 +86,7 @@ def get_observations(log):
             info['place_time'] = m.group(1)
         elif "remove_obstacle hit" in line["MESSAGE"]:
             remove_time_in_next_observe = True
-        elif "set_voltage hit" in line["MESSAGE"]:
+        elif "set_battery hit" in line["MESSAGE"]:
             message = line["MESSAGE"][len("/action/set_voltage hit with "):]
             message = message.replace("u'", "'")
             message = message.replace("'", '"')
