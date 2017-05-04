@@ -174,6 +174,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
+                ## kinect delay
+                , str(test_data['configParams']['testRun']['bump_delay']) if test_data['configParams']['testRun']['sensorPert'] else "n/a"
+
                 ## outcome
                 , test_data['test_outcome']
 

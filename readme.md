@@ -44,7 +44,7 @@ csv with columns (lines prefixed with `--` have been implemented):
 -- Rt = sim time of obstacle removal (if removed)
 -- Bv = voltage of battery perturbed
 -- Bt = sim time voltage was perturbed
-Kt = sim time that the kinect was perturbed
+-- Kt = sim time that the kinect was perturbed
 Dt = sim time that the perturbation was detected
 Ft = sim time when the challenge ended (e.g., report back that robot reached target)
 -- Fx = x of final location of the robot at Ft
