@@ -79,7 +79,7 @@ def get_obstacle_information(log):
             m = sim_time_pattern.search(line["MESSAGE"])
             info['remove_time'] = m.group(1)
     ## print info ## any printing to std out breaks the csv because we make
-                  ## it just by shell redirects
+            ## it just by shell redirects
     return info
 
 # take directory of interest on the command line as the first argument.
@@ -187,6 +187,5 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , obstacle_information['place_time'] if 'place_time' in obstacle_information else "n/a"
                 , obstacle_information['remove_time'] if 'remove_time' in obstacle_information else "n/a"
             ]
-
 
             print (",").join(output)
