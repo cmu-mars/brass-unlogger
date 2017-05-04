@@ -190,7 +190,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , final_location["y"]
 
                 ## distance from goal
-
                 , str(dist(target_x,target_y,final_location["x"],final_location["y"]))
 
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
