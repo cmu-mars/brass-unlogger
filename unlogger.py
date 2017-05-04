@@ -52,7 +52,7 @@ def get_final_location(path):
         return {"x" : "n/a", "y" : "n/a"}
     except TypeError:
         return {"x" : "n/a", "y" : "n/a"}
-        
+
 # Get the obstacle information from the log entries (test/log)
 # Return empty array if it does not exist
 def get_obstacle_information(log):
@@ -78,7 +78,8 @@ def get_obstacle_information(log):
             remove_time_in_next_observe = False
             m = sim_time_pattern.search(line["MESSAGE"])
             info['remove_time'] = m.group(1)
-    print info
+    ## print info ## any printing to std out breaks the csv because we make
+                  ## it just by shell redirects
     return info
 
 # take directory of interest on the command line as the first argument.
@@ -109,7 +110,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             final_location = get_final_location('%s/test' % test_dir)
 
             obstacle_information = get_obstacle_information(log_entries)
-            
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -179,14 +180,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## final y
                 , final_location["y"]
-                
+
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
                 , obstacle_information['x'] if 'x' in obstacle_information else "n/a"
                 , obstacle_information['y'] if 'y' in obstacle_information else "n/a"
                 , obstacle_information['place_time'] if 'place_time' in obstacle_information else "n/a"
                 , obstacle_information['remove_time'] if 'remove_time' in obstacle_information else "n/a"
-
-                
             ]
 
 
