@@ -138,12 +138,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 ## case
                 , test_dir_parts[2]
 
-                ## json path
-                , j_path
-
-                ## data path
-                , test_dir
-
                 ## start name
                 , test_data['configParams']['testInit']['start_loc']
 
@@ -217,6 +211,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 # notifications
                 , str(num_notifications)
+
+                ## json path
+                , j_path
+
+                ## data path
+                , test_dir
             ]
 
             print (",").join(output)
