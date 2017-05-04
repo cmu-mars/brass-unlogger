@@ -130,6 +130,9 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 num_notifications = "n/a"
 
 
+            pert_simtime = "n/a"
+            done_simtime = "n/a"
+
             test_dir_parts = test_dir.split("_")
             output = [
                 ## cp level
@@ -214,6 +217,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 # notifications
                 , str(num_notifications)
+
+                # sim time that the perturbation was detected
+                , pert_simtime
+
+                # sim time when the challenge ended
+                , done_simtime
 
                 ## json path
                 , j_path
