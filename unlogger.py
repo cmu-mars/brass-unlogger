@@ -171,6 +171,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 ## battery?
                 , str(test_data['configParams']['testRun']['battPert'])
 
+                ## perturb level battery level
+                , str(test_data['configParams']['testRun']['batt_reduce']) if test_data['configParams']['testRun']['battPert'] else "n/a"
+
+                ## time perturbed
+                , str(test_data['configParams']['testRun']['batt_delay']) if test_data['configParams']['testRun']['battPert'] else "n/a"
+
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
