@@ -45,12 +45,12 @@ csv with columns (lines prefixed with `--` have been implemented):
 -- Bv = voltage of battery perturbed
 -- Bt = sim time voltage was perturbed
 -- Kt = sim time that the kinect was perturbed
-Dt = sim time that the perturbation was detected
-Ft = sim time when the challenge ended (e.g., report back that robot reached target)
+-- Dt = sim time that the perturbation was detected
+-- Ft = sim time when the challenge ended (e.g., report back that robot reached target)
 -- Fx = x of final location of the robot at Ft
 -- Fy = y of final location of the robot at Ft
 -- Df = the distance between the robot and goal at Ft
-Fb = voltage reading at Ft
+-- Fb = voltage reading at Ft
 -- #N = number of notifications about the new deadline we gave
-D = sim time of the final deadline we notified about
+?? D = sim time of the final deadline we notified about
 ```

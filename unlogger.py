@@ -55,9 +55,9 @@ def get_final_location(path):
                     observation["voltage"] = str(observation["voltage"])
                     return observation
     except IOError:
-        return {"x" : "n/a", "y" : "n/a"}
+        return {"x" : "n/a", "y" : "n/a", "voltage" : "n/a"}
     except TypeError:
-        return {"x" : "n/a", "y" : "n/a"}
+        return {"x" : "n/a", "y" : "n/a", "voltage" : "n/a"}
 
 # Get the obstacle information from the log entries (test/log)
 # Return empty array if it does not exist
@@ -66,10 +66,10 @@ def get_observations(log):
     remove_time_in_next_observe = False
     battery_time_in_next_observe = False
     kinect_time_in_next_observe = False
-    
+
     def process_next_observe():
         return remove_time_in_next_observe or battery_time_in_next_observe or kinect_time_in_next_observe;
-    
+
     sim_time_pattern = re.compile('sim_time.: .(\d+)')
 
     for line in log:
@@ -106,7 +106,7 @@ def get_observations(log):
             if kinect_time_in_next_observe:
                 kinect_time_in_next_observe = False
                 info['kinect_time'] = m.group(1)
-               
+
     ## print info ## any printing to std out breaks the csv because we make
             ## it just by shell redirects
     return info
@@ -161,6 +161,8 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             # detect the perturbation and when we hit /action/done
             pert_simtime = "n/a"
             done_simtime = "n/a"
+
+            done_time_hit = False
             try:
                 with open('%s/test/ll-api.log' % test_dir) as api_file:
                     for line in api_file:
@@ -168,9 +170,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                             data = json.loads(((":").join((line.split(':'))[1:])))
                             pert_simtime = str(data['MESSAGE']['sim_time'])
 
-                        # we may hit done many times, but this will over
-                        # write each time, so we'll end up with the last.
-                        if "/action/done" in line:
+                        # we may hit done many times, or none at all. this
+                        # will record the first, leaving the values as n/a
+                        # if there are none (i.e. because we hit time out
+                        # and never notified)
+                        if (not done_time_hit) and ("/action/done" in line):
+                            done_time = True
                             data = json.loads(((":").join((line.split(':'))[1:])))
                             done_simtime = str(data['ARGUMENTS']['sim_time'])
             except IOError:
@@ -252,7 +257,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
                 ## final y
                 , final_location["y"]
-                
+
                 ## final voltage
                 , final_location["voltage"]
 
