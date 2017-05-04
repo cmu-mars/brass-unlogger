@@ -119,7 +119,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 ## outcome
                 , test_data['test_outcome']
 
-                ##Only cp1 has safety and timing, both have accuracy, and only cp2 has detection
+                ##Only cp1 has safety and timing, both have accuracy, and
+                ##only cp2 has detection.
+
+                ## gnarly index math going on here; could be wrong!
 
                 ## accuracy
                 , str(test_data[test_dir_parts[2]][0][1])
