@@ -10,9 +10,13 @@ import math
 
 from waypoints import WAYPOINTS
 
+## we use this string to mark cells as not applicable -- i.e. there's no
+## final robot location because the test harness crashed
+na = "n/a"
+
 def dist(x1, y1, x2, y2):
-    if "n/a" in [x1,x2,y1,y2]:
-        return "n/a"
+    if na in [x1,x2,y1,y2]:
+        return na
     return math.sqrt((float(x2) - float(x1))**2 + (float(y2) - float(y1))**2)
 
 def get_map_coord(name):
@@ -25,7 +29,6 @@ def get_map_coord(name):
     return wp
 
 # find last location of robot
-
 def get_log_entries(path):
     lines = []
     with open("%s/log" % path) as log:
@@ -55,9 +58,9 @@ def get_final_location(path):
                     observation["voltage"] = str(observation["voltage"])
                     return observation
     except IOError:
-        return {"x" : "n/a", "y" : "n/a", "voltage" : "n/a"}
+        return {"x" : na, "y" : na, "voltage" : na}
     except TypeError:
-        return {"x" : "n/a", "y" : "n/a", "voltage" : "n/a"}
+        return {"x" : na, "y" : na, "voltage" : na}
 
 # Get the obstacle information from the log entries (test/log)
 # Return empty array if it does not exist
@@ -147,7 +150,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
             # count the number of lines in notifications.txt to count how
             # many times we send notifications
-            num_notifications = "n/a"
+            num_notifications = na
             try:
                 if json_parts[0] == "CP1":
                     num_notifications = 0
@@ -155,12 +158,12 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                         for l in note_file:
                             num_notifications += 1
             except IOError:
-                num_notifications = "n/a"
+                num_notifications = na
 
             # read ll-api.log to compute the simtimes for when we
             # detect the perturbation and when we hit /action/done
-            pert_simtime = "n/a"
-            done_simtime = "n/a"
+            pert_simtime = na
+            done_simtime = na
 
             done_time_hit = False
             try:
@@ -179,10 +182,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                             data = json.loads(((":").join((line.split(':'))[1:])))
                             done_simtime = str(data['ARGUMENTS']['sim_time'])
             except IOError:
-                pert_simtime = "n/a"
-                done_simtime = "n/a"
+                pert_simtime = na
+                done_simtime = na
 
-            first_simtime = "n/a"
+            first_simtime = na
             # find the sim time in the first time they hit our
             # observe. this is somewhat redundant to the get_observations
             # above, but since it only looks at a prefix of the file, it's
@@ -198,7 +201,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                             first_simtime = m.group(1)
                             break
             except IOError:
-                first_simtime = "n/a"
+                first_simtime = na
 
             test_dir_parts = test_dir.split("_")
             output = [
@@ -236,19 +239,19 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data['configParams']['testRun']['battPert'])
 
                 ## perturb level battery level
-                , observations['voltage'] if 'voltage' in observations else "n/a"
-                #, str(test_data['configParams']['testRun']['batt_reduce']) if test_data['configParams']['testRun']['battPert'] else "n/a"
+                , observations['voltage'] if 'voltage' in observations else na
+                #, str(test_data['configParams']['testRun']['batt_reduce']) if test_data['configParams']['testRun']['battPert'] else na
 
                 ## time perturbed
-                , observations['battery_time'] if 'battery_time' in observations else "n/a"
-                #, str(test_data['configParams']['testRun']['batt_delay']) if test_data['configParams']['testRun']['battPert'] else "n/a"
+                , observations['battery_time'] if 'battery_time' in observations else na
+                #, str(test_data['configParams']['testRun']['batt_delay']) if test_data['configParams']['testRun']['battPert'] else na
 
                 ## kinect?
                 , str(test_data['configParams']['testRun']['sensorPert'])
 
                 ## kinect delay
-                , observations['kinect_time'] if 'kinect_time' in observations else "n/a"
-                #, str(test_data['configParams']['testRun']['bump_delay']) if test_data['configParams']['testRun']['sensorPert'] else "n/a"
+                , observations['kinect_time'] if 'kinect_time' in observations else na
+                #, str(test_data['configParams']['testRun']['bump_delay']) if test_data['configParams']['testRun']['sensorPert'] else na
 
                 ## outcome
                 , test_data['test_outcome']
@@ -262,13 +265,13 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(test_data[test_dir_parts[2]][0][1])
 
                 ## timing -- if cp1
-                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP1" else "n/a"
+                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP1" else na
 
                 ## safety -- if cp1
-                , str(test_data[test_dir_parts[2]][2][1]) if json_parts[0] == "CP1" else "n/a"
+                , str(test_data[test_dir_parts[2]][2][1]) if json_parts[0] == "CP1" else na
 
                 ## detection -- if cp2
-                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP2" else "n/a"
+                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP2" else na
 
                 ## final x
                 , final_location["x"]
@@ -283,10 +286,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 , str(dist(target_x,target_y,final_location["x"],final_location["y"]))
 
                 ## obstacle x, obstacle y, obstacle time, remove time, if there
-                , observations['x'] if 'x' in observations else "n/a"
-                , observations['y'] if 'y' in observations else "n/a"
-                , observations['place_time'] if 'place_time' in observations else "n/a"
-                , observations['remove_time'] if 'remove_time' in observations else "n/a"
+                , observations['x'] if 'x' in observations else na
+                , observations['y'] if 'y' in observations else na
+                , observations['place_time'] if 'place_time' in observations else na
+                , observations['remove_time'] if 'remove_time' in observations else na
 
                 # notifications
                 , str(num_notifications)
