@@ -232,8 +232,7 @@ def data_path():
 
 ## read in the header file
 with open('header.csv') as header_file:
-    header_names = map(lambda elem: elem.replace(' ', '_'),
-                       header_file.read().splitlines())
+    header_names = [elem.replace(' ', '_') for elem in header_file.read().splitlines()]
 
 for j_path in glob.glob('%s/*.json' % target_dir):
     ## skip the aggregated files; i don't know what they mean yet
@@ -264,7 +263,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             # store the target x and y coordinates, because we use them
             # several times below
             target_location = {'x' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['x'],
-                               'y' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']}
+                               'y' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']} # todo: lol eta expansion
 
             ## todo: make a co-ordinate object
 
