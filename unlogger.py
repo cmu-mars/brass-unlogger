@@ -145,23 +145,28 @@ def obstacle():
 def removed():
     if test_data['configParams']['testRun']['obsPert']:
         return test_data['configParams']['testRun']['obs_delay']
-    else:
-        return na
+    return na
 
 def battery_perturbed():
     return test_data['configParams']['testRun']['battPert']
 
 def batt_reduce():
-    return observations['voltage'] if 'voltage' in observations else na
+    if 'voltage' in observations:
+        return observations['voltage']
+    return na
 
 def batt_delay():
-    return observations['battery_time'] if 'battery_time' in observations else na
+    if 'battery_time' in observations:
+        return observations['battery_time']
+    return na
 
 def kinect():
     return test_data['configParams']['testRun']['sensorPert']
 
 def kinect_delay():
-    return observations['kinect_time'] if 'kinect_time' in observations else na
+    if 'kinect_time' in observations:
+        return observations['kinect_time']
+    return na
 
 def outcome():
     return test_data['test_outcome']
@@ -170,13 +175,19 @@ def accuracy():
     return test_data[test_dir_parts[2]][0][1]
 
 def timing():
-    return test_data[test_dir_parts[2]][1][1] if json_parts[0] == "CP1" else na
+    if json_parts[0] == "CP1":
+        return test_data[test_dir_parts[2]][1][1]
+    return na
 
 def safety():
-    return test_data[test_dir_parts[2]][2][1] if json_parts[0] == "CP1" else na
+    if json_parts[0] == "CP1":
+        return test_data[test_dir_parts[2]][2][1]
+    return na
 
 def detection():
-    return test_data[test_dir_parts[2]][1][1] if json_parts[0] == "CP2" else na
+    if json_parts[0] == "CP2":
+        return test_data[test_dir_parts[2]][1][1]
+    return na
 
 def final_x():
     return final_location["x"]
@@ -188,19 +199,28 @@ def final_voltage():
     return final_location["voltage"]
 
 def distance_to_goal():
-    return dist(target_location['x'],target_location['y'],final_location["x"],final_location["y"])
+    return dist(target_location['x'],target_location['y'],
+                final_location["x"],final_location["y"])
 
 def obstacle_x():
-    return observations['x'] if 'x' in observations else na
+    if 'x' in observations:
+        return observations['x']
+    return na
 
 def obstacle_y():
-    return observations['y'] if 'y' in observations else na
+    if 'y' in observations:
+        return observations['y']
+    return na
 
 def obstacle_time():
-    return observations['place_time'] if 'place_time' in observations else na
+    if 'place_time' in observations:
+        return observations['place_time']
+    return na
 
 def removal_time():
-    return observations['remove_time'] if 'remove_time' in observations else na
+    if 'remove_time' in observations:
+        return observations['remove_time']
+    return na
 
 def number_of_notifications():
     return num_notifications
