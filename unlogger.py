@@ -140,16 +140,16 @@ def target_y():
     return target_location['y']
 
 def obstacle():
-    return str(test_data['configParams']['testRun']['obsPert'])
+    return test_data['configParams']['testRun']['obsPert']
 
 def removed():
     if test_data['configParams']['testRun']['obsPert']:
-        return str(test_data['configParams']['testRun']['obs_delay'])
+        return test_data['configParams']['testRun']['obs_delay']
     else:
         return na
 
 def battery_perturbed():
-    return str(test_data['configParams']['testRun']['battPert'])
+    return test_data['configParams']['testRun']['battPert']
 
 def batt_reduce():
     return observations['voltage'] if 'voltage' in observations else na
@@ -158,7 +158,7 @@ def batt_delay():
     return observations['battery_time'] if 'battery_time' in observations else na
 
 def kinect():
-    return str(test_data['configParams']['testRun']['sensorPert'])
+    return test_data['configParams']['testRun']['sensorPert']
 
 def kinect_delay():
     return observations['kinect_time'] if 'kinect_time' in observations else na
@@ -167,16 +167,16 @@ def outcome():
     return test_data['test_outcome']
 
 def accuracy():
-    return str(test_data[test_dir_parts[2]][0][1])
+    return test_data[test_dir_parts[2]][0][1]
 
 def timing():
-    return str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP1" else na
+    return test_data[test_dir_parts[2]][1][1] if json_parts[0] == "CP1" else na
 
 def safety():
-    return str(test_data[test_dir_parts[2]][2][1]) if json_parts[0] == "CP1" else na
+    return test_data[test_dir_parts[2]][2][1] if json_parts[0] == "CP1" else na
 
 def detection():
-    return str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP2" else na
+    return test_data[test_dir_parts[2]][1][1] if json_parts[0] == "CP2" else na
 
 def final_x():
     return final_location["x"]
@@ -188,7 +188,7 @@ def final_voltage():
     return final_location["voltage"]
 
 def distance_to_goal():
-    return str(dist(target_location['x'],target_location['y'],final_location["x"],final_location["y"]))
+    return dist(target_location['x'],target_location['y'],final_location["x"],final_location["y"])
 
 def obstacle_x():
     return observations['x'] if 'x' in observations else na
@@ -203,7 +203,7 @@ def removal_time():
     return observations['remove_time'] if 'remove_time' in observations else na
 
 def number_of_notifications():
-    return str(num_notifications)
+    return num_notifications
 
 def pert_detect_sim_time():
     return pert_simtime
@@ -317,4 +317,4 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
             test_dir_parts = test_dir.split("_")
 
-            print (",").join([(locals()[name]) () for name in header_names])
+            print (",").join([str(locals()[name]()) for name in header_names])
