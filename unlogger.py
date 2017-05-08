@@ -109,13 +109,123 @@ def get_observations(log):
             if kinect_time_in_next_observe:
                 kinect_time_in_next_observe = False
                 info['kinect_time'] = m.group(1)
-
-    ## print info ## any printing to std out breaks the csv because we make
-            ## it just by shell redirects
     return info
 
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
+
+## functions per column, named as in header.csv
+def cp_level():
+    return json_parts[0]
+
+def case():
+    return test_dir_parts[2]
+
+def start_name():
+    return test_data['configParams']['testInit']['start_loc']
+
+def start_x():
+    return get_map_coord(test_data['configParams']['testInit']['start_loc'])['x']
+
+def start_y():
+    return get_map_coord(test_data['configParams']['testInit']['start_loc'])['y']
+
+def target_name():
+    return test_data['configParams']['testInit']['target_loc']
+
+def target_x():
+    return target_location['x']
+
+def target_y():
+    return target_location['y']
+
+def obstacle():
+    return str(test_data['configParams']['testRun']['obsPert'])
+
+def removed():
+    if test_data['configParams']['testRun']['obsPert']:
+        return str(test_data['configParams']['testRun']['obs_delay'])
+    else:
+        return na
+
+def battery_perturbed():
+    return str(test_data['configParams']['testRun']['battPert'])
+
+def batt_reduce():
+    return observations['voltage'] if 'voltage' in observations else na
+
+def batt_delay():
+    return observations['battery_time'] if 'battery_time' in observations else na
+
+def kinect():
+    return str(test_data['configParams']['testRun']['sensorPert'])
+
+def kinect_delay():
+    return observations['kinect_time'] if 'kinect_time' in observations else na
+
+def outcome():
+    return test_data['test_outcome']
+
+def accuracy():
+    return str(test_data[test_dir_parts[2]][0][1])
+
+def timing():
+    return str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP1" else na
+
+def safety():
+    return str(test_data[test_dir_parts[2]][2][1]) if json_parts[0] == "CP1" else na
+
+def detection():
+    return str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP2" else na
+
+def final_x():
+    return final_location["x"]
+
+def final_y():
+    return final_location["y"]
+
+def final_voltage():
+    return final_location["voltage"]
+
+def distance_to_goal():
+    return str(dist(target_location['x'],target_location['y'],final_location["x"],final_location["y"]))
+
+def obstacle_x():
+    return observations['x'] if 'x' in observations else na
+
+def obstacle_y():
+    return observations['y'] if 'y' in observations else na
+
+def obstacle_time():
+    return observations['place_time'] if 'place_time' in observations else na
+
+def removal_time():
+    return observations['remove_time'] if 'remove_time' in observations else na
+
+def number_of_notifications():
+    return str(num_notifications)
+
+def pert_detect_sim_time():
+    return pert_simtime
+
+def first_observed_sim_time():
+    return first_simtime
+
+def done_sim_time():
+    return done_simtime
+
+def json_path():
+    return j_path
+
+def data_path():
+    return test_dir
+
+
+
+## read in the header file
+with open('header.csv') as header_file:
+    header_names = map(lambda elem: elem.replace(' ', '_'),
+                       header_file.read().splitlines())
 
 for j_path in glob.glob('%s/*.json' % target_dir):
     ## skip the aggregated files; i don't know what they mean yet
@@ -145,8 +255,10 @@ for j_path in glob.glob('%s/*.json' % target_dir):
 
             # store the target x and y coordinates, because we use them
             # several times below
-            target_x = get_map_coord(test_data['configParams']['testInit']['target_loc'])['x']
-            target_y = get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']
+            target_location = {'x' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['x'],
+                               'y' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']}
+
+            ## todo: make a co-ordinate object
 
             # count the number of lines in notifications.txt to count how
             # many times we send notifications
@@ -204,110 +316,5 @@ for j_path in glob.glob('%s/*.json' % target_dir):
                 first_simtime = na
 
             test_dir_parts = test_dir.split("_")
-            output = [
-                ## cp level
-                json_parts[0]
 
-                ## case
-                , test_dir_parts[2]
-
-                ## start name
-                , test_data['configParams']['testInit']['start_loc']
-
-                ## start x
-                , get_map_coord(test_data['configParams']['testInit']['start_loc'])['x']
-
-                ## start y
-                , get_map_coord(test_data['configParams']['testInit']['start_loc'])['y']
-
-                ## target name
-                , test_data['configParams']['testInit']['target_loc']
-
-                ## target x
-                , target_x
-
-                ## target y
-                , target_y
-
-                ## obstacle?
-                , str(test_data['configParams']['testRun']['obsPert'])
-
-                ## removed?
-                , str(test_data['configParams']['testRun']['obs_delay']) if test_data['configParams']['testRun']['obsPert'] else 'n/a'
-
-                ## battery?
-                , str(test_data['configParams']['testRun']['battPert'])
-
-                ## perturb level battery level
-                , observations['voltage'] if 'voltage' in observations else na
-                #, str(test_data['configParams']['testRun']['batt_reduce']) if test_data['configParams']['testRun']['battPert'] else na
-
-                ## time perturbed
-                , observations['battery_time'] if 'battery_time' in observations else na
-                #, str(test_data['configParams']['testRun']['batt_delay']) if test_data['configParams']['testRun']['battPert'] else na
-
-                ## kinect?
-                , str(test_data['configParams']['testRun']['sensorPert'])
-
-                ## kinect delay
-                , observations['kinect_time'] if 'kinect_time' in observations else na
-                #, str(test_data['configParams']['testRun']['bump_delay']) if test_data['configParams']['testRun']['sensorPert'] else na
-
-                ## outcome
-                , test_data['test_outcome']
-
-                ##Only cp1 has safety and timing, both have accuracy, and
-                ##only cp2 has detection.
-
-                ## gnarly index math going on here; could be wrong!
-
-                ## accuracy
-                , str(test_data[test_dir_parts[2]][0][1])
-
-                ## timing -- if cp1
-                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP1" else na
-
-                ## safety -- if cp1
-                , str(test_data[test_dir_parts[2]][2][1]) if json_parts[0] == "CP1" else na
-
-                ## detection -- if cp2
-                , str(test_data[test_dir_parts[2]][1][1]) if json_parts[0] == "CP2" else na
-
-                ## final x
-                , final_location["x"]
-
-                ## final y
-                , final_location["y"]
-
-                ## final voltage
-                , final_location["voltage"]
-
-                ## distance from goal
-                , str(dist(target_x,target_y,final_location["x"],final_location["y"]))
-
-                ## obstacle x, obstacle y, obstacle time, remove time, if there
-                , observations['x'] if 'x' in observations else na
-                , observations['y'] if 'y' in observations else na
-                , observations['place_time'] if 'place_time' in observations else na
-                , observations['remove_time'] if 'remove_time' in observations else na
-
-                # notifications
-                , str(num_notifications)
-
-                # sim time that the perturbation was detected
-                , pert_simtime
-
-                # first observed sim time
-                , first_simtime
-
-                # sim time when the challenge ended
-                , done_simtime
-
-                ## json path
-                , j_path
-
-                ## data path
-                , test_dir
-            ]
-
-            print (",").join(output)
+            print (",").join([(locals()[name]) () for name in header_names])

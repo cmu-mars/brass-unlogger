@@ -1,1 +1,34 @@
-cp level,case,start name,start x,start y,target name,target x,target y,obstacle?,removed?,battery perturbed?,batt reduce,batt delay,kinect?,kinect delay,outcome,accuracy,timing,safety,detection,final x, final y,final voltage,distance to goal,obstacle x, obstacle y, obstacle time, removal time,number of notifications,pert detect sim time,first observed sim time,done sim time,json path,data path
+cp level
+case
+start name
+start x
+start y
+target name
+target x
+target y
+obstacle
+removed
+battery perturbed
+batt reduce
+batt delay
+kinect
+kinect delay
+outcome
+accuracy
+timing
+safety
+detection
+final x
+final y
+final voltage
+distance to goal
+obstacle x
+obstacle y
+obstacle time
+removal time
+number of notifications
+pert detect sim time
+first observed sim time
+done sim time
+json path
+data path
