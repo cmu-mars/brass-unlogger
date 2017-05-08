@@ -156,17 +156,13 @@ def batt_reduce():
     return na
 
 def batt_delay():
-    if 'battery_time' in observations:
-        return observations['battery_time']
-    return na
+    return observations.get('battery_time', na)
 
 def kinect():
     return test_data['configParams']['testRun']['sensorPert']
 
 def kinect_delay():
-    if 'kinect_time' in observations:
-        return observations['kinect_time']
-    return na
+    return observations.get('kinect_time',na)
 
 def outcome():
     return test_data['test_outcome']
@@ -203,24 +199,16 @@ def distance_to_goal():
                 final_location["x"],final_location["y"])
 
 def obstacle_x():
-    if 'x' in observations:
-        return observations['x']
-    return na
+    return observations.get('x', na)
 
 def obstacle_y():
-    if 'y' in observations:
-        return observations['y']
-    return na
+    return observations.get('y', na)
 
 def obstacle_time():
-    if 'place_time' in observations:
-        return observations['place_time']
-    return na
+    return observations.get('place_time',na)
 
 def removal_time():
-    if 'remove_time' in observations:
-        return observations['remove_time']
-    return na
+    return observations.get('remove_time',na)
 
 def number_of_notifications():
     return num_notifications
