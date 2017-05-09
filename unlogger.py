@@ -214,11 +214,13 @@ def final_voltage():
 
 def distance_to_goal():
     """remaining distance between the final location and the goal location"""
-    x1 , x2 , y1 , y2 = [target_location['x'],final_location['x'],
-                         target_location['y'],final_location['y']]
+    l = [target_location['x'],final_location['x'],
+         target_location['y'],final_location['y']]
+    x1 , x2 , y1 , y2 = l
 
-    if na in [x1 , x2 , y1 , y2]:
+    if na in l:
         return na
+
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def obstacle_x():
@@ -276,19 +278,17 @@ def data_path():
     return test_dir
 
 
-## read in the header file
+## read in the column name file
 with open('column-names.txt') as header_file:
     header_names = [elem.replace(' ', '_') for elem in header_file.read().splitlines()]
 
 for j_path in glob.glob('%s/*.json' % target_dir):
-    ## skip the aggregated files; i don't know what they mean yet
+    ## skip the aggregated files
     if 'aggregate' in j_path:
         continue
 
-    basename = os.path.basename(j_path)
-
-    ## split out the hash
-    json_parts = basename.split('_')
+    ## split the file name on underscores
+    json_parts = os.path.basename(j_path).split('_')
 
     ## parts[2] ends in a '.json' because python basename isn't posix
     ## standard, so this grabs just the hash that they use to name each
@@ -299,16 +299,11 @@ for j_path in glob.glob('%s/*.json' % target_dir):
         test_data = json.load(test_json)
 
         for test_dir in glob.glob('%s/*%s*/' % (target_dir, test_name)):
-
-            ## if valid, call bradley's with ('%s/test/' % test_dir)
+            # collect data used by more than one column below.
             log_entries = get_log_entries('%s/test' % test_dir)
             final_location = get_final_location('%s/test' % test_dir)
             observations = get_observations(log_entries)
-
-            # store the target x and y coordinates, because we use them
-            # several times below
             target_location = get_map_coord(test_data['configParams']['testInit']['target_loc'])
-
 
             # read ll-api.log to compute the simtimes for when we
             # detect the perturbation and when we hit /action/done
