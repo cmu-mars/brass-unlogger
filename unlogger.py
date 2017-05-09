@@ -14,18 +14,13 @@ from waypoints import WAYPOINTS
 ## final robot location because the test harness crashed
 na = "n/a"
 
-def dist(x1, y1, x2, y2):
-    if na in [x1,x2,y1,y2]:
-        return na
-    return math.sqrt((float(x2) - float(x1))**2 + (float(y2) - float(y1))**2)
-
 def get_map_coord(name):
     filtered = filter(lambda waypoint: waypoint["node-id"] == name, WAYPOINTS)
     if len(filtered) != 1:
         return {'x': "0.0", 'y' : "0,0"}
     wp = filtered[0]['coord']
-    wp['x'] = str(wp['x'])
-    wp['y'] = str(wp['y'])
+    wp['x'] = float(wp['x'])
+    wp['y'] = float(wp['y'])
     return wp
 
 # find last location of robot
@@ -43,7 +38,7 @@ def get_final_sim_time(path):
     for i in lines:
         if "/action/done" in i["ENDPOINT"]:
             return int(i["ARGUMENTS"]["sim_time"])
-    return 0
+    return -1
 
 def get_final_location(path):
     end_time = get_final_sim_time(path)
@@ -53,8 +48,8 @@ def get_final_location(path):
                 observation = json.loads(line)
                 observation = observation["RESULT"]
                 if end_time <= int(observation["sim_time"]):
-                    observation["x"] = str(observation["x"])
-                    observation["y"] = str(observation["y"])
+                    observation["x"] = float(observation["x"])
+                    observation["y"] = float(observation["y"])
                     observation["voltage"] = str(observation["voltage"])
                     return observation
     except IOError:
@@ -219,8 +214,12 @@ def final_voltage():
 
 def distance_to_goal():
     """remaining distance between the final location and the goal location"""
-    return dist(target_location['x'],target_location['y'],
-                final_location["x"],final_location["y"])
+    x1 , x2 , y1 , y2 = [target_location['x'],final_location['x'],
+                         target_location['y'],final_location['y']]
+
+    if na in [x1 , x2 , y1 , y2]:
+        return na
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def obstacle_x():
     """x of the obstacle (if placed)"""
@@ -264,7 +263,7 @@ def data_path():
 
 
 ## read in the header file
-with open('header.csv') as header_file:
+with open('column-names.txt') as header_file:
     header_names = [elem.replace(' ', '_') for elem in header_file.read().splitlines()]
 
 for j_path in glob.glob('%s/*.json' % target_dir):
@@ -290,15 +289,11 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             ## if valid, call bradley's with ('%s/test/' % test_dir)
             log_entries = get_log_entries('%s/test' % test_dir)
             final_location = get_final_location('%s/test' % test_dir)
-
             observations = get_observations(log_entries)
 
             # store the target x and y coordinates, because we use them
             # several times below
-            target_location = {'x' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['x'],
-                               'y' : get_map_coord(test_data['configParams']['testInit']['target_loc'])['y']} # todo: lol eta expansion
-
-            ## todo: make a co-ordinate object
+            target_location = get_map_coord(test_data['configParams']['testInit']['target_loc'])
 
             # count the number of lines in notifications.txt to count how
             # many times we send notifications

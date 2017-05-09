@@ -4,7 +4,7 @@ if ! [ -e "results.csv" ]
 then
     # turn header.csv into a csv instead of newline delimited, chopping off
     # the trailing comma from tr
-   cat header.csv | tr '\n' ',' | sed 's/,$/\n/' >> results.csv
+   cat column-names.txt | tr '\n' ',' | sed 's/,$/\n/' >> results.csv
 
    for d in initialTests/*
    do
