@@ -116,118 +116,151 @@ target_dir = sys.argv[1]
 
 ## functions per column, named as in header.csv
 def cp_level():
+    """which challenge problem, 1 or 2"""
     return json_parts[0]
 
 def case():
+    """which case, BaselineA = A, BaselineB = B, Challenge = C"""
     return test_dir_parts[2]
 
 def start_name():
+    """name of start waypoint"""
     return test_data['configParams']['testInit']['start_loc']
 
 def start_x():
+    """corresponding x of the start"""
     return get_map_coord(test_data['configParams']['testInit']['start_loc'])['x']
 
 def start_y():
+    """corresponding y of the start"""
     return get_map_coord(test_data['configParams']['testInit']['start_loc'])['y']
 
 def target_name():
+    """name of target waypoint"""
     return test_data['configParams']['testInit']['target_loc']
 
 def target_x():
+    """corresponding x of the target"""
     return target_location['x']
 
 def target_y():
+    """corresponding y of the target"""
     return target_location['y']
 
 def obstacle():
+    """was an obstacle placed?"""
     return test_data['configParams']['testRun']['obsPert']
 
 def removed():
+    """if an obstacle was placed, was it removed?"""
     if test_data['configParams']['testRun']['obsPert']:
         return test_data['configParams']['testRun']['obs_delay']
     return na
 
 def battery_perturbed():
+    """was the battery level changed?"""
     return test_data['configParams']['testRun']['battPert']
 
 def batt_reduce():
+    """if the battery level was changed, to what voltage?"""
     if 'voltage' in observations:
         return observations['voltage']
     return na
 
 def batt_delay():
+    """ if the battery level was changed, how long did they wait?"""
     return observations.get('battery_time', na)
 
 def kinect():
+    """ was the kinect bumped? """
     return test_data['configParams']['testRun']['sensorPert']
 
 def kinect_delay():
+    """ if the kinect was bumped, how long did they wait to bump it?"""
     return observations.get('kinect_time',na)
 
 def outcome():
+    """what was the overall outcome? invalid / valid?"""
     return test_data['test_outcome']
 
 def accuracy():
+    """the outcome of the accuracy intent"""
     return test_data[test_dir_parts[2]][0][1]
 
 def timing():
+    """the outcome of the timing intent, if in cp1"""
     if json_parts[0] == "CP1":
         return test_data[test_dir_parts[2]][1][1]
     return na
 
 def safety():
+    """the outcome of the safety intent, if in cp1"""
     if json_parts[0] == "CP1":
         return test_data[test_dir_parts[2]][2][1]
     return na
 
 def detection():
+    """the outcome of the detection intent, if in cp2"""
     if json_parts[0] == "CP2":
         return test_data[test_dir_parts[2]][1][1]
     return na
 
 def final_x():
+    """x coordinate of the robot when it ended"""
     return final_location["x"]
 
 def final_y():
+    """y coordinate of the robot when it ended"""
     return final_location["y"]
 
 def final_voltage():
+    """voltage of the robot when it ended"""
     return final_location["voltage"]
 
 def distance_to_goal():
+    """remaining distance between the final location and the goal location"""
     return dist(target_location['x'],target_location['y'],
                 final_location["x"],final_location["y"])
 
 def obstacle_x():
+    """x of the obstacle (if placed)"""
     return observations.get('x', na)
 
 def obstacle_y():
+    """y of the obstacle (if placed)"""
     return observations.get('y', na)
 
 def obstacle_time():
+    """sim time of obstacle placement (if placed)"""
     return observations.get('place_time',na)
 
 def removal_time():
+    """sim time of obstacle removal (if placed and removed)"""
     return observations.get('remove_time',na)
 
 def number_of_notifications():
+    """number of notifications that we sent to the TH"""
     return num_notifications
 
 def pert_detect_sim_time():
+    """sim time when we noticed the perturbation"""
     return pert_simtime
 
 def first_observed_sim_time():
+    """the first sim time returned in any observe message (best estimate of start time)"""
     return first_simtime
 
 def done_sim_time():
+    """sim time when the challenge ended (e.g., report back that robot reached target)"""
     return done_simtime
 
 def json_path():
+    """path to json file describing this test"""
     return j_path
 
 def data_path():
+    """path to directory with logs for this test"""
     return test_dir
-
 
 
 ## read in the header file
