@@ -25,3 +25,8 @@
   looks like `randomTests/`, with json files that share hashes in their
   names with directories. this is reflected in the slightly odd structure
   of `run.sh`.
+
+* there is a slight security risk here, in that names in the colums file
+  are being used to look up into the locals dictionary. this shouldn't be a
+  problem because this is not world facing: just don't adversarially name
+  columns things like `Robert'); DROP TABLE Students; --`.
