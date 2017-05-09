@@ -238,8 +238,22 @@ def removal_time():
     return observations.get('remove_time',na)
 
 def number_of_notifications():
-    """number of notifications that we sent to the TH"""
-    return num_notifications
+    # count the number of lines in notifications.txt to count how
+    # many times we send notifications
+    try:
+        if json_parts[0] == "CP1":
+            num_notifications = 0
+            with open('%s/test/mars_notifications.txt' % test_dir) as note_file:
+                for l in note_file:
+                    num_notifications += 1
+            return num_notifications
+        else:
+            # there are only notifications in the CP1 condition
+            return na
+    # if the file isn't there, it's because there was an error condition
+    # somewhere, so it's also not applicable
+    except IOError:
+        return na
 
 def pert_detect_sim_time():
     """sim time when we noticed the perturbation"""
@@ -295,17 +309,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             # several times below
             target_location = get_map_coord(test_data['configParams']['testInit']['target_loc'])
 
-            # count the number of lines in notifications.txt to count how
-            # many times we send notifications
-            num_notifications = na
-            try:
-                if json_parts[0] == "CP1":
-                    num_notifications = 0
-                    with open('%s/test/mars_notifications.txt' % test_dir) as note_file:
-                        for l in note_file:
-                            num_notifications += 1
-            except IOError:
-                num_notifications = na
 
             # read ll-api.log to compute the simtimes for when we
             # detect the perturbation and when we hit /action/done
