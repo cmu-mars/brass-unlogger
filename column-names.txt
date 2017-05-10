@@ -30,5 +30,6 @@ number of notifications
 pert detect sim time
 first observed sim time
 done sim time
+failure reason
 json path
 data path

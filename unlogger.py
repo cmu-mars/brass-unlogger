@@ -104,8 +104,31 @@ def get_observations(log):
             if kinect_time_in_next_observe:
                 kinect_time_in_next_observe = False
                 info['kinect_time'] = m.group(1)
+        elif "rainbow failed to start" in line["MESSAGE"]:
+            info['rainbow_error'] = True
     return info
 
+def process_start_log(path):
+    start_info = {}
+    try:
+        gzpattern = re.compile("process has died.*gzserver")
+        #rbwpattern = re.compile("rainbow failed to start")
+        with open("%s/start.sh.log" % path) as start:
+            for line in start:
+                if (gzpattern.search(line)):
+                    start_info["gazebo_error"] = True
+                    return start_info
+        return start_info  
+        # with open("%s/log" %path) as log:
+            # for line in log:
+                # if (rbwpattern.search(line)):
+                    # return "RBW"
+        # return ""
+    except IOError:
+        return start_info
+    except TypeError:
+        return start_info
+    
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
 
@@ -276,7 +299,14 @@ def json_path():
 def data_path():
     """path to directory with logs for this test"""
     return test_dir
-
+    
+def failure_reason():
+    """return the reason for an error, if it is there"""
+    if "rainbow_error" in observations:
+        return "RBW"
+    if "gazebo_error" in start_info:
+        return "GAZ"
+    return na
 
 ## read in the column name file
 with open('column-names.txt') as header_file:
@@ -304,6 +334,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             final_location = get_final_location('%s/test' % test_dir)
             observations = get_observations(log_entries)
             target_location = get_map_coord(test_data['configParams']['testInit']['target_loc'])
+            start_info = process_start_log("%s/test" %test_dir)
 
             # read ll-api.log to compute the simtimes for when we
             # detect the perturbation and when we hit /action/done
