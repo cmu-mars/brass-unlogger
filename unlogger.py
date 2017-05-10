@@ -216,11 +216,11 @@ def distance_to_goal():
     """remaining distance between the final location and the goal location"""
     l = [target_location['x'],final_location['x'],
          target_location['y'],final_location['y']]
-    x1 , x2 , y1 , y2 = l
 
     if na in l:
         return na
 
+    x1 , x2 , y1 , y2 = l
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def obstacle_x():
