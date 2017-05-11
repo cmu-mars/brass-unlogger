@@ -30,5 +30,11 @@ number of notifications
 pert detect sim time
 first observed sim time
 done sim time
+plans issued
+adaptations tried
+adaptations failed
+failure reason
+bump delta
+bump ground
 json path
 data path
