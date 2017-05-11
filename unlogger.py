@@ -69,7 +69,8 @@ def get_observations(log):
         return remove_time_in_next_observe or battery_time_in_next_observe or kinect_time_in_next_observe;
 
     sim_time_pattern = re.compile('sim_time.: .(\d+)')
-
+    action_error_patterb = re.compile('action/(.*) raised an exception')
+    start_returned = False
     for line in log:
         if "place_obstacle hit" in line["MESSAGE"]:
             message = line["MESSAGE"][len("/action/place_obstacle hit with "):]
@@ -78,6 +79,8 @@ def get_observations(log):
             loc = json.loads(message)
             info['x'] = str(loc["ARGUMENTS"]['x'])
             info['y'] = str(loc["ARGUMENTS"]['y'])
+        elif "start returning" in line["MESSAGE"]:
+            start_returned = True
         elif "place_obstacle returning" in line["MESSAGE"]:
             message = line["MESSAGE"]
             m = sim_time_pattern.search(message)
@@ -106,6 +109,15 @@ def get_observations(log):
                 info['kinect_time'] = m.group(1)
         elif "rainbow failed to start" in line["MESSAGE"]:
             info['rainbow_error'] = True
+        elif "has same start and end locations" in line["MESSAGE"]:
+            info['config_same_start_end'] = True
+        elif action_error_patterb.search(line["MESSAGE"]):
+            info['endpoint_error'] = action_error_patterb.search(line["MESSAGE"]).group(1)
+        elif "couldn't connect to TH" in line["MESSAGE"]:
+            info['TH_error'] = True
+        elif "posting status TEST_ERROR" in line["MESSAGE"]:
+            info['TEST_ERROR'] = line["MESSAGE"]
+    info['start_returned'] = start_returned
     return info
 
 def process_start_log(path):
@@ -116,8 +128,17 @@ def process_start_log(path):
         with open("%s/start.sh.log" % path) as start:
             for line in start:
                 if (gzpattern.search(line)):
-                    start_info["gazebo_error"] = True
+                    start_info["gazebo_error"] = "GAZ"
                     return start_info
+                elif "Header is empty" in line:
+                    start_info["gazebo_error"] = "GAZM"
+                    return start_info
+                elif re.search('gzserver.*boost.*failed', line):
+                    start_info["gazebo_error"] = "GAZB";
+                    return start_info
+                elif "TF_NAN_INPUT" in line:
+                    start_info["gazebo_error"] = "NaN";
+                    return start_info;
         return start_info  
         # with open("%s/log" %path) as log:
             # for line in log:
@@ -128,6 +149,29 @@ def process_start_log(path):
         return start_info
     except TypeError:
         return start_info
+        
+def process_rainbow_log(path):
+    rainbow_info = {"delta_err" : 0, "ground_err" : 0, "plans_executed" : 0, "adaptations" : 0, "failed_adaptations" : 0}
+    try:
+        with open('%s/rainbow.log' %path) as rainbow:
+            for line in rainbow:
+                if "Calibration error detected by delta" in line:
+                    rainbow_info["delta_err"] = rainbow_info["delta_err"] + 1
+                elif "Calibration error detected by ground" in line:
+                    rainbow_info["ground_err"] = rainbow_info["ground_err"] + 1
+                elif "Got a new plan -- executing" in line:
+                    rainbow_info["plans_executed"] = rainbow_info["plans_executed"] + 1
+                elif "Found new plan" in line:
+                    rainbow_info["adaptations"] = rainbow_info["adaptations"] + 1
+                elif "Generating last resort plan" in line:
+                    rainbow_info["failed_adaptations"] = rainbow_info["failed_adaptations"] + 1
+                        
+    except IOError:
+        return rainbow_info
+    except TypeError:
+        return rainbow_info
+    
+    return rainbow_info
     
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
@@ -305,8 +349,39 @@ def failure_reason():
     if "rainbow_error" in observations:
         return "RBW"
     if "gazebo_error" in start_info:
-        return "GAZ"
+        return start_info["gazebo_error"]
+    if "config_same_start_end" in observations:
+        return "CSE"
+    if "endpoint_error" in observations:
+        return 'EPE %s' % observations['endpoint_error']
+    if "TH_error" in observations:
+        return "TH"
+    if "TEST_ERROR" in observations:
+        return "TE %s" % observations["TEST_ERROR"]
+    if not observations['start_returned']:
+        return "STF"
     return na
+ 
+def bump_delta():
+    """return the number of times in a test delta error caught miscalibration"""
+    return rainbow_info["delta_err"]
+    
+def bump_ground():
+    """return the number of times in a test ground error caught miscalibration"""
+    return rainbow_info["ground_err"]
+    
+def plans_issued():
+    """return the number of times in a test that rainbow issued a new plan"""
+    return rainbow_info["plans_executed"]
+    
+def adaptations_tried():
+    """return the number of times rainbow tried to find a plan"""
+    return rainbow_info["adaptations"]
+    
+def adaptations_failed():
+    """returns the number of times rainbow couldn't find a plan"""
+    return rainbow_info["failed_adaptations"]
+    
 
 ## read in the column name file
 with open('column-names.txt') as header_file:
@@ -335,6 +410,7 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             observations = get_observations(log_entries)
             target_location = get_map_coord(test_data['configParams']['testInit']['target_loc'])
             start_info = process_start_log("%s/test" %test_dir)
+            rainbow_info = process_rainbow_log('%s/test' %test_dir)
 
             # read ll-api.log to compute the simtimes for when we
             # detect the perturbation and when we hit /action/done
