@@ -17,10 +17,8 @@ na = "n/a"
 def get_map_coord(name):
     filtered = filter(lambda waypoint: waypoint["node-id"] == name, WAYPOINTS)
     if len(filtered) != 1:
-        return {'x': "0.0", 'y' : "0,0"}
+        return {'x': "0.0", 'y' : "0.0"}
     wp = filtered[0]['coord']
-    wp['x'] = float(wp['x'])
-    wp['y'] = float(wp['y'])
     return wp
 
 # find last location of robot
@@ -48,6 +46,7 @@ def get_final_location(path):
                 observation = json.loads(line)
                 observation = observation["RESULT"]
                 if end_time <= int(observation["sim_time"]):
+                    # todo: i don't know why these lines are needed
                     observation["x"] = float(observation["x"])
                     observation["y"] = float(observation["y"])
                     observation["voltage"] = str(observation["voltage"])
@@ -263,7 +262,18 @@ def pert_detect_sim_time():
 
 def first_observed_sim_time():
     """the first sim time returned in any observe message (best estimate of start time)"""
-    return first_simtime
+    # this is probably somewhat redundant to the get_observations above
+    try:
+        sim_time_pattern = re.compile('sim_time..: ..(\d+)')
+        with open('%s/test/log' % test_dir) as log_file:
+            for line in log_file:
+                if "/action/observe returning response" in line:
+                    # todo; what if it doesn't match
+                    m = sim_time_pattern.search(line)
+                    return m.group(1)
+        return na
+    except IOError:
+        return na
 
 def done_sim_time():
     """sim time when the challenge ended (e.g., report back that robot reached target)"""
@@ -329,24 +339,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             except IOError:
                 pert_simtime = na
                 done_simtime = na
-
-            first_simtime = na
-            # find the sim time in the first time they hit our
-            # observe. this is somewhat redundant to the get_observations
-            # above, but since it only looks at a prefix of the file, it's
-            # faster and fine for now.
-            try:
-                with open('%s/test/log' % test_dir) as log_file:
-                    for line in log_file:
-                        if "/action/observe returning response" in line:
-                            ## easier to grab it with a regex as above,
-                            ## because it's in escaped json in a string
-                            sim_time_pattern = re.compile('sim_time..: ..(\d+)')
-                            m = sim_time_pattern.search(line)
-                            first_simtime = m.group(1)
-                            break
-            except IOError:
-                first_simtime = na
 
             test_dir_parts = test_dir.split("_")
 
