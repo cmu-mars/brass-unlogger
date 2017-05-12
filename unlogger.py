@@ -138,7 +138,7 @@ def process_start_log(path):
                 elif "TF_NAN_INPUT" in line:
                     start_info["gazebo_error"] = "NaN";
                     return start_info;
-        return start_info  
+        return start_info
         # with open("%s/log" %path) as log:
             # for line in log:
                 # if (rbwpattern.search(line)):
@@ -148,7 +148,7 @@ def process_start_log(path):
         return start_info
     except TypeError:
         return start_info
-        
+
 def process_rainbow_log(path):
     rainbow_info = {"delta_err" : 0, "ground_err" : 0, "plans_executed" : 0, "adaptations" : 0, "failed_adaptations" : 0}
     try:
@@ -164,14 +164,14 @@ def process_rainbow_log(path):
                     rainbow_info["adaptations"] = rainbow_info["adaptations"] + 1
                 elif "Generating last resort plan" in line:
                     rainbow_info["failed_adaptations"] = rainbow_info["failed_adaptations"] + 1
-                        
+
     except IOError:
         return rainbow_info
     except TypeError:
         return rainbow_info
-    
+
     return rainbow_info
-    
+
 # take directory of interest on the command line as the first argument.
 target_dir = sys.argv[1]
 
@@ -325,7 +325,16 @@ def number_of_notifications():
 
 def pert_detect_sim_time():
     """sim time when we noticed the perturbation"""
-    return pert_simtime
+    try:
+        # this is probably somewhat redundant to the get_observations above
+        with open('%s/test/ll-api.log' % test_dir) as api_file:
+            for line in api_file:
+                if "PERTURBATION_DETECTED" in line:
+                    data = json.loads(((":").join((line.split(':'))[1:])))
+                    return data['MESSAGE']['sim_time']
+        return na
+    except IOError:
+        return na
 
 def first_observed_sim_time():
     """the first sim time returned in any observe message (best estimate of start time)"""
@@ -343,8 +352,19 @@ def first_observed_sim_time():
         return na
 
 def done_sim_time():
-    """sim time when the challenge ended (e.g., report back that robot reached target)"""
-    return done_simtime
+    """sim time when the challenge ended (e.g., report back that robot reached
+       target). we may have sent the done message multiple times; this reports the
+       first"""
+    try:
+        ## todo: this may be redundant with some of the other log scraping
+        with open('%s/test/ll-api.log' % test_dir) as api_file:
+            for line in api_file:
+                if "/action/done" in line:
+                    data = json.loads(((":").join((line.split(':'))[1:])))
+                    return data['ARGUMENTS']['sim_time']
+        return na
+    except IOError:
+        return na
 
 def json_path():
     """path to json file describing this test"""
@@ -353,7 +373,7 @@ def json_path():
 def data_path():
     """path to directory with logs for this test"""
     return test_dir
-    
+
 def failure_reason():
     """return the reason for an error, if it is there"""
     if "rainbow_error" in observations:
@@ -371,27 +391,27 @@ def failure_reason():
     if not observations['start_returned']:
         return "STF"
     return na
- 
+
 def bump_delta():
     """return the number of times in a test delta error caught miscalibration"""
     return rainbow_info["delta_err"]
-    
+
 def bump_ground():
     """return the number of times in a test ground error caught miscalibration"""
     return rainbow_info["ground_err"]
-    
+
 def plans_issued():
     """return the number of times in a test that rainbow issued a new plan"""
     return rainbow_info["plans_executed"]
-    
+
 def adaptations_tried():
     """return the number of times rainbow tried to find a plan"""
     return rainbow_info["adaptations"]
-    
+
 def adaptations_failed():
     """returns the number of times rainbow couldn't find a plan"""
     return rainbow_info["failed_adaptations"]
-    
+
 
 ## read in the column name file
 with open('column-names.txt') as header_file:
@@ -422,30 +442,6 @@ for j_path in glob.glob('%s/*.json' % target_dir):
             start_info = process_start_log("%s/test" %test_dir)
             rainbow_info = process_rainbow_log('%s/test' %test_dir)
 
-            # read ll-api.log to compute the simtimes for when we
-            # detect the perturbation and when we hit /action/done
-            pert_simtime = na
-            done_simtime = na
-
-            done_time_hit = False
-            try:
-                with open('%s/test/ll-api.log' % test_dir) as api_file:
-                    for line in api_file:
-                        if "PERTURBATION_DETECTED" in line:
-                            data = json.loads(((":").join((line.split(':'))[1:])))
-                            pert_simtime = str(data['MESSAGE']['sim_time'])
-
-                        # we may hit done many times, or none at all. this
-                        # will record the first, leaving the values as n/a
-                        # if there are none (i.e. because we hit time out
-                        # and never notified)
-                        if (not done_time_hit) and ("/action/done" in line):
-                            done_time = True
-                            data = json.loads(((":").join((line.split(':'))[1:])))
-                            done_simtime = str(data['ARGUMENTS']['sim_time'])
-            except IOError:
-                pert_simtime = na
-                done_simtime = na
 
             test_dir_parts = test_dir.split("_")
 
