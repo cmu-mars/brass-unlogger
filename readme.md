@@ -1,3 +1,25 @@
+when run from a directory containing uncompressed copies of the data from
+MIT/LL, `run.sh` will produce a CSV with one row per test described in the
+logs and columns as given in `column-names.txt`. For example:
+
+```
+iev@bruce brass-unlogger % ls
+column-names.txt randomTests      run.sh           waypoints.py
+initialTests     readme.md        unlogger.py
+iev@bruce brass-unlogger % ./run.sh
+iev@bruce brass-unlogger % ls
+column-names.txt randomTests      results.csv      unlogger.py
+initialTests     readme.md        run.sh           waypoints.py
+iev@bruce brass-unlogger %
+
+```
+
+`run.sh` is not meant to be especially robust, so it should really only be
+used in this way. it's up to you to download and uncompress `initialTests`
+and `randomTests` and put them in the right place; the `.gitignore` file
+for this repo explicitly bans them from being committed because together
+they are about 4.5 GB.
+
 * `column-names.txt` gives the names of the columns in the order that
   they'll appear. to move columns around, just move the names in around in
   this file. these names can't contain any weird characters --
