@@ -61,6 +61,6 @@ directory called `images/`. That directory must not exist when you run
 `make_maps.py`. It takes about a half a second to run for each, so this
 will be fairly lengthy for the whole results file.
 
-Many thanks to (Tom7)[https://www.cs.cmu.edu/~tom7/] for making his font
+Many thanks to [Tom7](https://www.cs.cmu.edu/~tom7/) for making his font
 "Hockey is Lif" available for free use on
-(http://fonts.tom7.com/fonts98.html).
+[http://fonts.tom7.com/fonts98.html].
