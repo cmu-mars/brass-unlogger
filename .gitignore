@@ -9,3 +9,6 @@ results.csv
 
 ## ignore python compiled files
 *.pyc
+
+## this is produced by make_maps.py
+images/
