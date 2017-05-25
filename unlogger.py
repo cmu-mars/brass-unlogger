@@ -4,7 +4,6 @@ import json
 import glob
 import sys
 import os
-import csv
 import re
 import math
 
