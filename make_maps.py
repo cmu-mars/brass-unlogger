@@ -38,7 +38,23 @@ for line in bar(results):
     mapbase = Image.open('Wean-entire-floor4.png')
     draw = ImageDraw.Draw(mapbase)
     width, height = mapbase.size
+    
+    text_x = width - 500
+    text_y = height - 300
+    draw.text((text_x, text_y), line['cp level'], font=fnt, fill=(0,0,0,255))
+    draw.text((text_x, text_y + 45), "Case: " + line['case'] + ", Result: " + line['outcome'], font=fnt, fill=(0,0,0,255))
+    draw.text((text_x, text_y + 90), "Accuracy: " + line['accuracy'] + ", Timing: " + line['timing'], font=fnt, fill=(0,0,0,255))
+    draw.text((text_x, text_y + 135), "Battery: " + line['final voltage'] + "Goal dist" + line['distance to goal'], font=fnt, fill=(0,0,0,255)) 
 
+    if line['obstacle x'] != na and line['obstacle y'] != na:
+        # red 255,0,0
+        x,y = trans(line['obstacle x'],line['obstacle y'], width, height)
+        draw.rectangle((x-1/0.054,y-1/0.054,x+1/0.054,y+1/0.054), fill=(200,0,0,255), outline=(200,0,0,255))
+        draw.text((x,y),
+                  "obstacle",
+                  font=fnt,
+                  fill=(200,0,0,255))
+    
     if line['start x'] != na and line['start y'] != na:
         # green 0,128,0
         x,y = trans(line['start x'], line['start y'], width, height)
@@ -61,21 +77,14 @@ for line in bar(results):
     if line['final x'] != na and line['final y'] != na:
         # yellow 255,255,0
         x,y = trans(line['final x'],line['final y'], width, height)
-        draw.ellipse((x - 5, y-5, x+5, y+5), fill='black', outline='black')
+        draw.ellipse((x - 5, y-5, x+5, y+5), fill=(127,127,0,255), outline='black')
 
-        draw.text((x,y),
+        draw.text((x,y-10),
                   "final",
                   font=fnt,
                   fill=(127,127,0,255))
 
-    if line['obstacle x'] != na and line['obstacle y'] != na:
-        # red 255,0,0
-        x,y = trans(line['obstacle x'],line['obstacle y'], width, height)
-        draw.rectangle((x-1/0.054,y-1/0.054,x+1/0.054,y+1/0.054), fill=(200,0,0,255), outline=(200,0,0,255))
-        draw.text((x,y),
-                  "obstacle",
-                  font=fnt,
-                  fill=(200,0,0,255))
+
 
     del draw
 
